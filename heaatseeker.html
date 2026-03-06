@@ -3,325 +3,93 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Heaatseeker — Authentification</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    color: #111;
-    background: #fff;
-  }
-  header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 40px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 24px;
-  }
-  header svg { width: 56px; height: 56px; flex-shrink: 0; }
-  header h1 { font-size: 1.6rem; margin: 0; }
-  header p { margin: 4px 0 0; color: #555; font-size: 0.9rem; }
-
-  h2 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #999;
-    margin-bottom: 14px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 6px;
-  }
-
-  /* Upload zone */
-  .upload-zone {
-    border: 2px dashed #ccc;
-    border-radius: 6px;
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    margin-bottom: 16px;
-  }
-  .upload-zone:hover, .upload-zone.dragover {
-    border-color: #111;
-    background: #f9f9f9;
-  }
-  .upload-zone input { display: none; }
-  .upload-zone p { margin: 0; color: #555; font-size: 0.95rem; }
-  .upload-zone span { font-size: 2rem; display: block; margin-bottom: 8px; }
-
-  /* Preview grid */
-  .preview-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-  .preview-grid img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-
-  /* Button */
-  .btn {
-    display: inline-block;
-    background: #111;
-    color: #fff;
-    padding: 11px 24px;
-    border: none;
-    font-size: 0.95rem;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    text-align: center;
-  }
-  .btn:hover { background: #333; }
-  .btn:disabled { background: #ccc; cursor: not-allowed; }
-
-  /* Result */
-  .result-box {
-    display: none;
-    margin-top: 24px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 24px;
-  }
-  .result-box.visible { display: block; }
-
-  .verdict {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-  .verdict.legit { color: #16a34a; }
-  .verdict.fake  { color: #dc2626; }
-
-  .result-details {
-    font-size: 0.9rem;
-    color: #555;
-    line-height: 2;
-  }
-
-  .confidence-bar-track {
-    height: 8px;
-    background: #eee;
-    border-radius: 4px;
-    margin: 12px 0;
-    overflow: hidden;
-  }
-  .confidence-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: #16a34a;
-    transition: width 0.8s ease;
-    width: 0;
-  }
-  .confidence-bar-fill.low { background: #dc2626; }
-
-  .warn {
-    background: #fffbeb;
-    border: 1px solid #fcd34d;
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    color: #92400e;
-    margin-top: 12px;
-    display: none;
-  }
-  .warn.visible { display: block; }
-
-  .error-box {
-    display: none;
-    background: #fef2f2;
-    border: 1px solid #fca5a5;
-    border-radius: 4px;
-    padding: 10px 14px;
-    font-size: 0.85rem;
-    color: #991b1b;
-    margin-top: 12px;
-  }
-  .error-box.visible { display: block; }
-
-  .status {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: 10px;
-    display: none;
-  }
-  .status.visible { display: block; }
-
-  footer {
-    border-top: 1px solid #ddd;
-    padding-top: 16px;
-    font-size: 0.8rem;
-    color: #aaa;
-    margin-top: 48px;
-  }
-</style>
+<title>Heaatseeker — Auth</title>
+<link rel="stylesheet" href="/static/heaatseeker.css"/>
 </head>
 <body>
+<div class="grid-bg"></div>
+<div class="glow-orb"></div>
 
-<header>
-  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="100" r="100" fill="black"/>
-    <rect x="38" y="48" width="18" height="104" rx="4" fill="white"/>
-    <rect x="38" y="88" width="52" height="18" rx="3" fill="white"/>
-    <rect x="72" y="48" width="18" height="104" rx="4" fill="white"/>
-    <path d="M108 58 Q108 48 122 48 L158 48 Q172 48 172 62 L172 78 Q172 90 158 90 L120 90 Q108 90 108 104 L108 138 Q108 152 122 152 L162 152 Q176 152 176 138 L176 124" stroke="white" stroke-width="17" stroke-linecap="round" fill="none"/>
-    <path d="M155 62 L175 42 M162 42 L175 42 L175 55" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  </svg>
-  <div>
-    <h1>Heaatseeker</h1>
-    <p>📍 Lyon, France — Authentification de sneakers</p>
+<div class="topbar">
+  <span class="topbar-brand">Lyon, France</span>
+  <div class="topbar-logo">
+    <img src="/static/logo.jpg" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"/>
+    <span>Heaatseeker</span>
   </div>
-</header>
+  <button class="topbar-btn" onclick="logout()">Déconnexion</button>
+</div>
 
-<section>
-  <h2>Authentifier une paire</h2>
+<div class="page-wrapper">
 
-  <!-- Drop zone -->
-  <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-    <input type="file" id="fileInput" accept="image/*" multiple/>
-    <span>🖼️</span>
-    <p>Cliquez ou déposez vos photos ici</p>
-    <p style="font-size:0.8rem;color:#aaa;margin-top:6px;">JPG, PNG — plusieurs images acceptées</p>
+  <div class="hero">
+    <p class="hero-intro">Introducing</p>
+    <p>L'authentification sneaker alimentée par l'IA.<br/>Paste a link or upload photos — get a verdict.</p>
   </div>
 
-  <!-- Preview -->
-  <div class="preview-grid" id="previewGrid"></div>
+  <div class="main-card card-bottom-corners">
 
-  <!-- Submit -->
-  <button class="btn" id="submitBtn" onclick="submitImages()" disabled>
-    Analyser les photos
-  </button>
+    <!-- URL -->
+    <div class="card-section-label">Analyser une annonce</div>
+    <div class="url-row">
+      <input type="url" id="urlInput" placeholder="vinted.fr/items/... ou grailed.com/listings/..."/>
+      <button class="btn-accent" id="urlBtn" onclick="submitUrl()">Analyser</button>
+    </div>
 
-  <!-- Status -->
-  <div class="status" id="status">⏳ Analyse en cours…</div>
+    <div class="divider"><span>ou</span></div>
 
-  <!-- Error -->
-  <div class="error-box" id="errorBox"></div>
+    <!-- Upload -->
+    <div class="card-section-label">Uploader des photos</div>
+    <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <input type="file" id="fileInput" accept="image/*" multiple/>
+      <span class="upload-icon">↑</span>
+      <p>Déposez vos photos ici ou cliquez</p>
+      <p class="upload-hint">JPG, PNG — plusieurs images acceptées</p>
+    </div>
+
+    <div class="preview-grid" id="previewGrid"></div>
+
+    <button class="btn-primary" id="submitBtn" onclick="submitImages()" disabled>
+      Lancer l'analyse
+    </button>
+
+    <div class="status-msg" id="status">Analyse en cours…</div>
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Loading overlay -->
+    <div class="card-loading-overlay" id="cardOverlay">
+      <div class="spinner"></div>
+      <span class="spinner-label" id="spinnerLabel">Analyse en cours…</span>
+    </div>
+  </div>
 
   <!-- Result -->
-  <div class="result-box" id="resultBox">
-    <div class="verdict" id="verdict"></div>
-    <div class="confidence-bar-track">
-      <div class="confidence-bar-fill" id="confFill"></div>
+  <div class="result-card" id="resultBox">
+    <div class="result-header">
+      <div>
+        <div class="result-label">Verdict</div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+      <div class="result-right">
+        <div class="result-label">Confiance</div>
+        <div class="conf-value" id="confValue"></div>
+        <div class="conf-bar-track"><div class="conf-bar-fill" id="confFill"></div></div>
+      </div>
     </div>
-    <div class="result-details" id="resultDetails"></div>
-    <div class="warn" id="warnBox">
-      ⚠️ Confiance faible — envoyez plus d'images pour une meilleure évaluation.
+    <div class="result-stats" id="resultStats"></div>
+    <div class="warn-bar" id="warnBox">⚠ Confiance faible — envoyez plus d'images pour une meilleure évaluation</div>
+    <div class="gradcam-wrap" id="gradcamSection">
+      <div class="card-section-label" style="padding:20px 24px 0;margin:0;">Analyse image par image</div>
+      <div id="gradcamGrid" style="padding:16px 24px 24px;display:flex;flex-direction:column;gap:12px;"></div>
     </div>
   </div>
-</section>
 
-<footer>
-  © 2025 Heaatseeker · Lyon, France ·
-  <a href="https://www.instagram.com/heaatseeker" target="_blank">Instagram</a>
-</footer>
+  <footer>
+    <span>© 2025 Heaatseeker · Lyon, France</span>
+    <a href="https://www.instagram.com/heaatseeker" target="_blank">Instagram →</a>
+  </footer>
 
-<script>
-const API = '';  // même origine que Flask (python app.py)
-let selectedFiles = [];
+</div>
 
-// File input change
-document.getElementById('fileInput').addEventListener('change', function() {
-  handleFiles(Array.from(this.files));
-});
-
-// Drag & drop
-const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('dragover');
-  handleFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
-});
-
-function handleFiles(files) {
-  selectedFiles = [...selectedFiles, ...files];
-  renderPreviews();
-  document.getElementById('submitBtn').disabled = selectedFiles.length === 0;
-  hide('errorBox'); hide('resultBox'); hide('status');
-}
-
-function renderPreviews() {
-  const grid = document.getElementById('previewGrid');
-  grid.innerHTML = '';
-  selectedFiles.forEach((file, i) => {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(file);
-    img.title = file.name;
-    grid.appendChild(img);
-  });
-}
-
-async function submitImages() {
-  if (!selectedFiles.length) return;
-
-  document.getElementById('submitBtn').disabled = true;
-  show('status'); hide('errorBox'); hide('resultBox');
-
-  const formData = new FormData();
-  selectedFiles.forEach(f => formData.append('images', f));
-
-  try {
-    const resp = await fetch(`${API}/api/authenticate-upload`, {
-      method: 'POST',
-      body: formData
-    });
-    const data = await resp.json();
-    hide('status');
-    document.getElementById('submitBtn').disabled = false;
-
-    if (data.error) {
-      showError(data.error);
-    } else {
-      showResult(data);
-    }
-  } catch(e) {
-    hide('status');
-    document.getElementById('submitBtn').disabled = false;
-    showError('Impossible de contacter le serveur. Vérifiez que Flask tourne sur le port 5000.');
-  }
-}
-
-function showResult(data) {
-  const isLegit = data.result === 'LEGIT';
-  const conf = data.avg_confidence;
-  const low  = conf < 50;
-
-  document.getElementById('verdict').textContent = isLegit ? '✅ LEGIT' : '❌ FAKE';
-  document.getElementById('verdict').className = 'verdict ' + (isLegit ? 'legit' : 'fake');
-
-  const fill = document.getElementById('confFill');
-  fill.className = 'confidence-bar-fill' + (low ? ' low' : '');
-  setTimeout(() => fill.style.width = conf + '%', 50);
-
-  document.getElementById('resultDetails').innerHTML =
-    `Confiance moyenne : <strong>${conf.toFixed(1)}%</strong><br/>
-     Images analysées : ${data.total}<br/>
-     Votes LEGIT : ${data.legit_count} — Votes FAKE : ${data.fake_count}
-     ${data.mock ? '<br/><em style="color:#aaa">⚠ Mode démo (modèle absent)</em>' : ''}`;
-
-  document.getElementById('warnBox').className = 'warn' + (low ? ' visible' : '');
-  show('resultBox');
-}
-
-function showError(msg) {
-  const el = document.getElementById('errorBox');
-  el.textContent = '❌ ' + msg;
-  el.classList.add('visible');
-}
-
-function show(id) { document.getElementById(id).classList.add('visible'); }
-function hide(id) { document.getElementById(id).classList.remove('visible'); }
-</script>
+<script src="/static/heaatseeker.js"></script>
 </body>
 </html>

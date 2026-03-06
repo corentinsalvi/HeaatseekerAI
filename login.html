@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heaatseeker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400&display=swap');
+
+:root {
+  --bg: #050810;
+  --grid: rgba(255,255,255,0.04);
+  --glass: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --accent: #e8ff00;
+  --text: #e8eaf0;
+  --muted: #4a5068;
+  --danger: #ff4466;
+  --glow: rgba(232,255,0,0.15);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Grid background */
+.grid-bg {
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+  z-index: 0;
+}
+
+/* Corner marks */
+.grid-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Glow orb */
+.glow-orb {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,255,0,0.06) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Top bar */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px;
+  z-index: 10;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(5,8,16,0.6);
+  backdrop-filter: blur(12px);
+}
+.topbar-brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar-logo svg { width: 28px; height: 28px; }
+.topbar-logo span {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.topbar-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px 14px;
+  border-radius: 100px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.topbar-link:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+
+/* Hero text */
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+.hero-intro {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  background: linear-gradient(135deg, #ffffff 0%, #8892b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+/* Card */
+.card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 32px 80px rgba(0,0,0,0.6);
+}
+
+/* Corner dots */
+.card::before, .card::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--glass-border);
+}
+.card::before { top: 12px; left: 12px; box-shadow: 0 0 0 1px var(--glass-border); }
+.card::after  { top: 12px; right: 12px; box-shadow: 0 0 0 1px var(--glass-border); }
+
+.card-bottom-corners::before, .card-bottom-corners::after {
+  content: '';
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--glass-border);
+  box-shadow: 0 0 0 1px var(--glass-border);
+}
+.card-bottom-corners::before { bottom: 12px; left: 12px; }
+.card-bottom-corners::after  { bottom: 12px; right: 12px; }
+
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 28px;
+  letter-spacing: 0.02em;
+}
+
+.field-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 8px;
+}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+  padding: 11px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  outline: none;
+  border-radius: 8px;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 18px;
+}
+input::placeholder { color: var(--muted); }
+input:focus {
+  border-color: rgba(232,255,0,0.4);
+  background: rgba(232,255,0,0.03);
+}
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  background: var(--text);
+  color: #000;
+  border: none;
+  padding: 12px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+.btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.error-box {
+  display: none;
+  background: rgba(255,68,102,0.08);
+  border: 1px solid rgba(255,68,102,0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--danger);
+  margin-bottom: 16px;
+  letter-spacing: 0.04em;
+}
+.error-box.visible { display: block; }
+
+.card-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.card-footer a { color: var(--accent); text-decoration: none; }
+.card-footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="glow-orb"></div>
+
+<div class="topbar">
+  <span class="topbar-brand">Lyon, France</span>
+  <div class="topbar-logo">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="100" fill="#e8ff00"/>
+      <rect x="38" y="48" width="18" height="104" rx="4" fill="#000"/>
+      <rect x="38" y="88" width="52" height="18" rx="3" fill="#000"/>
+      <rect x="72" y="48" width="18" height="104" rx="4" fill="#000"/>
+      <path d="M108 58 Q108 48 122 48 L158 48 Q172 48 172 62 L172 78 Q172 90 158 90 L120 90 Q108 90 108 104 L108 138 Q108 152 122 152 L162 152 Q176 152 176 138 L176 124" stroke="#000" stroke-width="17" stroke-linecap="round" fill="none"/>
+      <path d="M155 62 L175 42 M162 42 L175 42 L175 55" stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <span>Heaatseeker</span>
+  </div>
+  <a href="https://www.instagram.com/heaatseeker" target="_blank" class="topbar-link">Instagram →</a>
+</div>
+
+<div class="hero">
+  <p class="hero-intro">Introducing</p>
+  <h1>Heaatseeker</h1>
+  <p>L'authentification sneaker alimentée par l'IA.<br/>Lyon, France.</p>
+</div>
+
+<div class="card card-bottom-corners">
+  <div class="card-title">Connexion</div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <label class="field-label">Identifiant</label>
+  <input type="text" id="username" placeholder="votre identifiant" autocomplete="username"/>
+
+  <label class="field-label">Mot de passe</label>
+  <input type="password" id="password" placeholder="••••••••" autocomplete="current-password"/>
+
+  <button class="btn-primary" onclick="login()">Continuer</button>
+
+  <div class="card-footer">
+    Pas de compte ? <a href="/register">S'inscrire</a>
+  </div>
+</div>
+
+<script>
+async function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  if (!username || !password) { showError('Veuillez remplir tous les champs.'); return; }
+  try {
+    const resp = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await resp.json();
+    data.ok ? window.location.href = '/' : showError(data.error || 'Identifiant ou mot de passe incorrect.');
+  } catch(e) { showError('Impossible de contacter le serveur.'); }
+}
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+</script>
+</body>
+</html>
